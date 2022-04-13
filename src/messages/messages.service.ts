@@ -1,32 +1,38 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { Message } from './entities/message.entity';
-
+import { InjectModel } from '@nestjs/mongoose';
+import { MessageSchema } from 'src/Schemas/message.schema';
+import { Model } from "mongoose"
+import { MessagesInterface } from 'src/Schemas/message.schema';
+import { Observable, of } from 'rxjs';
 
 @Injectable()
 export class MessagesService {
   // The messages array here will act as a temporary database. 
-  messages: any[] = [{id:"12ysq1t11u1i345",sender: "Gibbah", text:"Welcome to Gibbah", createdAt:Date.now(),starred:false }];
-  
-  userStorage = {}
 
-  create(createMessageDto: CreateMessageDto, clientId:string) {
+  constructor(@InjectModel('Message') private messageModel: Model<MessagesInterface> ){
+
+  }
+
+  create(createMessageDto: MessagesInterface, clientId:string){
     // This essentially just pushes the message created into the backend and
     // This adds the data to the backend, but we still need to tell the client that the message was sent
-    const message = {
-      sender: this.userStorage[clientId],
-      text: createMessageDto.text
-    }
+    // const message = {
+    //   sender: this.userStorage[clientId],
+    //   text: createMessageDto.text
+    // }
     // basically copied over the data to another variable then return the copied message data
-    this.messages.push(message);
-    return message;
+    const createdMessage = new this.messageModel(createMessageDto);
+
+    createdMessage.save();
+
+    return createdMessage;
 
   }
 
   findAll() {
     // This should be incharge of getting all the messages from the group. 
-    return this.messages;
+    // return this.messages;
   }
 
   findOne(id: number) {
@@ -34,11 +40,11 @@ export class MessagesService {
   }
   // This just gets the name based on the socket id.
   getClientName(clientId){
-    return this.userStorage[clientId]
+    // return this.userStorage[clientId]
   }
 
   join(name: string, clientId:string ){
-    this.userStorage[clientId] = name;
+    // this.userStorage[clientId] = name;
     return name;
   }
   remove(id: number) {

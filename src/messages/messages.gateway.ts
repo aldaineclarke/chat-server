@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
 import {Server, Socket} from "socket.io";
+import { MessagesInterface } from 'src/Schemas/message.schema';
 import { MessagesService } from './messages.service';
-import { CreateMessageDto } from './dto/create-message.dto';
  
 
 
@@ -21,7 +21,7 @@ export class MessagesGateway {
 
   // Needed to create message. should only be given to persons of a group.
   @SubscribeMessage('createMessage')
-  create(@MessageBody() createMessageDto: CreateMessageDto, @ConnectedSocket() client: Socket) {
+  create(@MessageBody() createMessageDto: MessagesInterface, @ConnectedSocket() client: Socket) {
     // This will be either a promise or an observable since the value may not be availble when we request it.
     const message = this.messagesService.create(createMessageDto, client.id);
 

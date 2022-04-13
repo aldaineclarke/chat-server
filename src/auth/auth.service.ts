@@ -1,10 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-// import { EMPTY, from, map, Observable, of } from 'rxjs';
-// import { LoginService } from 'src/login/login.service';
-import { UserInterface } from 'src/users/users.interface';
-// import { UserDocument } from 'src/Schemas/user.schema';
 import { JwtService } from '@nestjs/jwt'
+import { UserInterface } from 'src/Schemas/user.schema';
 import { UserService } from 'src/users/users.service';
 
 @Injectable()
@@ -30,9 +27,9 @@ export class AuthService {
 
         
 // }
-    async validateUser(username: string, password: string){
-        const user:UserInterface = await this.userService.findOnePromise(username);
-        if(user && user.password == password){
+    async validateUser(email: string, password: string){
+        const user:UserInterface = await this.userService.findOnePromise(email);
+        if(user && this.userService.compareHashed(user.password, password)){
             return user.toObject();
         }    
         
@@ -40,8 +37,12 @@ export class AuthService {
                 
     }
     async login (user:UserInterface){
-        
-        const payload = {name:user.name, sub: user._id}
+        const userId = user._id;
+        return {access_token: this.generateToken(user).access_token, id: userId}
+    }
+
+    generateToken(user:UserInterface){
+        const payload = {email:user.email, sub: user._id}
         return {
             access_token: this.jwtService.sign(payload)
         }

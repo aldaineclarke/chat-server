@@ -24,8 +24,24 @@ import { Document } from "mongoose";
 
 // export const UserSchema = SchemaFactory.createForClass(User)
 export const UserSchema = new mongoose.Schema({
-    name: {type: String, required: true},
+    firstName: {type: String, required: true},
+    lastName: {type: String, required: true},
+    username: {type: String, required: true},
     email: {type: String, required: true},
     password: {type: String, required: true},
-    profile: {type:String, default: "/assets/IMG/defaultProfile.png"}
+    profile: {type:String, default: "/assets/IMG/defaultProfile.png"},
+    dateJoined: {type:Date, default: new Date()},
+    // contacts: {type: [Contact]}
+    // conversations: {type:[Conversation]}
 })
+
+
+export interface UserInterface extends Document {
+    firstName:string;
+    lastName: string
+    username: string;
+    password:string;
+    email:string;
+    profileImg: string;
+    dateJoined: Date;
+}

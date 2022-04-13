@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
-import {  Body, Controller, Get, Post, Req, Request, UseGuards } from '@nestjs/common';
+import {  Body, Controller, Get, Param, Post, Req, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
-import { UserInterface } from 'src/users/users.interface';
+import { UserInterface } from 'src/Schemas/user.schema';
 import { UserService } from 'src/users/users.service';
 
 @Controller()
@@ -18,7 +18,8 @@ export class LoginController {
 
     @Post('signUp')
     SignUpUser(@Body() data: UserInterface ){
-        return this.userService.createUser(data);
+        this.userService.createUser(data);
+        return this.authService.generateToken(data);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -26,5 +27,17 @@ export class LoginController {
     getProtectedRoute(@Request() req){
         return req.user
     }
+    @UseGuards(JwtAuthGuard)
+    @Get('user/:id')
+    getUser(@Param() paramObj){
+        return this.userService.findById(paramObj.id)
+    }
+    // @UseGuards(JwtAuthGuard)
+    // @Get('user/:id')
+    // getUser(@Param() paramObj){
+    //     return this.userService.findById(paramObj.id)
+    // }
+
+
 
 }
